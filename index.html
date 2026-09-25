@@ -1,0 +1,1175 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SAHEL MOVIES - Official Streaming Platform & Admin CMS</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        obsidian: '#050508',
+                        glass: {
+                            base: 'rgba(18, 19, 28, 0.72)',
+                            card: 'rgba(24, 26, 38, 0.68)',
+                            border: 'rgba(255, 255, 255, 0.12)',
+                            hover: 'rgba(255, 255, 255, 0.2)'
+                        },
+                        vj: {
+                            purple: '#9D4EDD',
+                            red: '#FF2E55',
+                            cyan: '#00F5D4',
+                            gold: '#FFB703',
+                            emerald: '#10B981'
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Plus Jakarta Sans', 'sans-serif'],
+                    },
+                    boxShadow: {
+                        'glass-card': '0 20px 50px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.2)',
+                        'glow-purple': '0 0 35px -5px rgba(157, 78, 221, 0.45)',
+                        'glow-cyan': '0 0 35px -5px rgba(0, 245, 212, 0.35)',
+                        'glow-red': '0 0 35px -5px rgba(255, 46, 85, 0.4)'
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body {
+            background-color: #050508;
+            color: #F3F4F6;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            overflow-x: hidden;
+        }
+
+        .liquid-glass {
+            background: rgba(18, 19, 28, 0.75);
+            backdrop-filter: blur(28px) saturate(200%);
+            -webkit-backdrop-filter: blur(28px) saturate(200%);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.25);
+        }
+
+        .liquid-glass-card {
+            background: rgba(24, 26, 38, 0.68);
+            backdrop-filter: blur(20px) saturate(180%);
+            -webkit-backdrop-filter: blur(20px) saturate(180%);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.15);
+        }
+
+        .specular-border {
+            position: relative;
+        }
+        .specular-border::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            border-radius: inherit;
+            padding: 1px;
+            background: linear-gradient(135deg, rgba(255,255,255,0.35) 0%, rgba(255,255,255,0.02) 50%, rgba(157, 78, 221, 0.4) 100%);
+            -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+            -webkit-mask-composite: xor;
+            mask-composite: exclude;
+            pointer-events: none;
+        }
+
+        /* Cinematic Title Glow Animation */
+        @keyframes pulse-glow {
+            0%, 100% { text-shadow: 0 0 20px rgba(255, 46, 85, 0.8), 0 0 40px rgba(157, 78, 221, 0.6); }
+            50% { text-shadow: 0 0 35px rgba(0, 245, 212, 0.9), 0 0 60px rgba(255, 183, 3, 0.7); }
+        }
+        .sahel-glow {
+            animation: pulse-glow 3s infinite ease-in-out;
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            height: 6px;
+            width: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #050508;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 9999px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(157, 78, 221, 0.7);
+        }
+
+        [x-cloak] { display: none !important; }
+    </style>
+</head>
+
+<body x-data="sahelApp()" x-init="initApp()" class="min-h-screen relative antialiased bg-obsidian text-slate-100 flex flex-col">
+
+    <div class="fixed inset-0 pointer-events-none z-0 overflow-hidden">
+        <div class="absolute -top-40 -left-40 w-96 h-96 bg-vj-purple/20 rounded-full blur-[140px]"></div>
+        <div class="absolute top-1/3 -right-40 w-96 h-96 bg-vj-cyan/15 rounded-full blur-[150px]"></div>
+        <div class="absolute -bottom-20 left-1/3 w-[35rem] h-[35rem] bg-vj-red/15 rounded-full blur-[160px]"></div>
+    </div>
+
+    <div x-show="showSplash" 
+         x-transition:leave="transition ease-in duration-800 transform" 
+         x-transition:leave-start="opacity-100 scale-100" 
+         x-transition:leave-end="opacity-0 scale-105" 
+         class="fixed inset-0 z-50 bg-obsidian flex flex-col items-center justify-center p-6 text-center select-none">
+        
+        <div class="relative z-10 space-y-6 max-w-lg">
+            <div class="w-24 h-24 mx-auto rounded-3xl bg-gradient-to-tr from-vj-purple via-vj-red to-vj-gold p-1 shadow-glow-red animate-bounce">
+                <div class="w-full h-full bg-obsidian rounded-[22px] flex items-center justify-center">
+                    <i class="fa-solid fa-play text-vj-red text-4xl ml-1"></i>
+                </div>
+            </div>
+
+            <div class="space-y-2">
+                <h1 class="text-6xl md:text-8xl font-black tracking-widest text-white sahel-glow uppercase">SAHEL</h1>
+                <p class="text-sm font-bold text-vj-cyan tracking-widest uppercase">Official VJ Luganda Streaming Platform</p>
+            </div>
+
+            <!-- Loading Bar -->
+            <div class="w-64 mx-auto bg-slate-900 rounded-full h-2 overflow-hidden border border-white/10">
+                <div class="h-full bg-gradient-to-r from-vj-purple via-vj-red to-vj-gold rounded-full transition-all duration-100 ease-out" :style="'width: ' + splashProgress + '%'"></div>
+            </div>
+
+            <p class="text-xs text-slate-400 font-medium">Powered by Ssemujju Muhammad Sahel &bull; Loading VJ Catalog...</p>
+        </div>
+    </div>
+
+    <div class="fixed top-5 right-5 z-50 space-y-2 max-w-sm pointer-events-none">
+        <template x-for="toast in toasts" :key="toast.id">
+            <div x-transition:enter="transition ease-out duration-300 transform" 
+                 x-transition:enter-start="opacity-0 translate-y-2 scale-95" 
+                 x-transition:enter-end="opacity-100 translate-y-0 scale-100" 
+                 x-transition:leave="transition ease-in duration-200 transform" 
+                 x-transition:leave-start="opacity-100 scale-100" 
+                 x-transition:leave-end="opacity-0 scale-90"
+                 class="pointer-events-auto liquid-glass rounded-2xl p-4 flex items-center gap-3 border border-white/20 shadow-2xl">
+                <div class="w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold shrink-0"
+                     :class="{
+                         'bg-vj-emerald/20 text-vj-emerald border border-vj-emerald/40': toast.type === 'success',
+                         'bg-vj-red/20 text-vj-red border border-vj-red/40': toast.type === 'error',
+                         'bg-vj-gold/20 text-vj-gold border border-vj-gold/40': toast.type === 'info'
+                     }">
+                    <i class="fa-solid" :class="{
+                        'fa-circle-check': toast.type === 'success',
+                        'fa-circle-exclamation': toast.type === 'error',
+                        'fa-bell': toast.type === 'info'
+                    }"></i>
+                </div>
+                <div class="flex-1 min-w-0">
+                    <p class="text-xs font-bold text-white" x-text="toast.title"></p>
+                    <p class="text-[11px] text-slate-300 truncate" x-text="toast.message"></p>
+                </div>
+                <button @click="removeToast(toast.id)" class="text-slate-400 hover:text-white p-1">
+                    <i class="fa-solid fa-xmark text-xs"></i>
+                </button>
+            </div>
+        </template>
+    </div>
+
+    <header x-show="!showSplash" class="sticky top-0 z-40 w-full p-3 md:p-4 transition-all duration-300">
+        <div class="max-w-7xl mx-auto liquid-glass rounded-2xl px-4 py-3 flex items-center justify-between gap-3 specular-border shadow-2xl">
+            
+            <!-- Logo & Brand -->
+            <div class="flex items-center gap-3 cursor-pointer" @click="currentTab = 'home'; viewMode = 'client'">
+                <div class="w-10 h-10 rounded-2xl bg-gradient-to-tr from-vj-purple via-vj-red to-vj-gold p-0.5 flex items-center justify-center shadow-glow-red">
+                    <div class="w-full h-full bg-obsidian rounded-[14px] flex items-center justify-center">
+                        <i class="fa-solid fa-play text-vj-red text-base ml-0.5"></i>
+                    </div>
+                </div>
+                <div class="hidden sm:block">
+                    <h1 class="text-base font-black tracking-wider text-white">SAHEL <span class="text-vj-red text-xs">MOVIES</span></h1>
+                    <p class="text-[10px] text-vj-cyan font-bold tracking-tight">VJ LUGANDA STREAMING</p>
+                </div>
+            </div>
+
+            <!-- Client Search Bar -->
+            <div x-show="viewMode === 'client'" class="relative flex-1 max-w-md mx-2">
+                <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-3 text-slate-400 text-xs"></i>
+                <input type="text" x-model="searchQuery" placeholder="Search VJ Junior, Ice P, Action, Luganda translated..." class="w-full bg-slate-900/80 rounded-full pl-9 pr-4 py-2 text-xs text-white placeholder-slate-400 border border-white/10 focus:outline-none focus:border-vj-purple transition">
+            </div>
+
+            <!-- Top Header Action Buttons -->
+            <div class="flex items-center gap-2">
+                
+                <!-- Dev Info Button -->
+                <button @click="showDevModal = true" class="px-3 py-2 rounded-xl liquid-glass hover:bg-white/10 text-vj-gold text-xs font-bold transition flex items-center gap-1.5" title="Developer Credentials">
+                    <i class="fa-solid fa-code text-xs"></i>
+                    <span class="hidden md:inline">Dev Info</span>
+                </button>
+
+                <!-- Free Movies Nav Button -->
+                <button x-show="viewMode === 'client'" @click="currentTab = 'free'" :class="currentTab === 'free' ? 'bg-vj-emerald text-white' : 'liquid-glass text-vj-emerald hover:bg-white/10'" class="px-3 py-2 rounded-xl text-xs font-bold transition flex items-center gap-1.5">
+                    <i class="fa-solid fa-gift text-xs"></i>
+                    <span>Free Movies</span>
+                </button>
+
+                <!-- User Account / Login Button -->
+                <div x-show="viewMode === 'client'" class="relative">
+                    <template x-if="currentUser">
+                        <div class="flex items-center gap-2">
+                            <button @click="showUserMenu = !showUserMenu" class="flex items-center gap-2 px-3 py-2 rounded-xl liquid-glass hover:bg-white/10 text-xs font-bold text-white">
+                                <i class="fa-solid fa-user-check text-vj-cyan"></i>
+                                <span class="max-w-[80px] truncate" x-text="currentUser.name"></span>
+                                <i class="fa-solid fa-chevron-down text-[10px]"></i>
+                            </button>
+                            <div x-show="showUserMenu" @click.outside="showUserMenu = false" class="absolute right-0 top-12 w-48 liquid-glass rounded-2xl p-2 shadow-2xl border border-white/20 space-y-1 text-xs z-50">
+                                <div class="p-2 border-b border-white/10">
+                                    <p class="font-bold text-white" x-text="currentUser.name"></p>
+                                    <p class="text-[10px] text-vj-gold" x-text="currentUser.isVip ? 'VIP PASS ACTIVE' : 'FREE ACCOUNT'"></p>
+                                </div>
+                                <button @click="openSubscriptionModal()" class="w-full text-left p-2 hover:bg-white/10 rounded-xl text-vj-gold font-bold">
+                                    <i class="fa-solid fa-crown mr-1"></i> Upgrade / Renew VIP
+                                </button>
+                                <button @click="logout()" class="w-full text-left p-2 hover:bg-white/10 rounded-xl text-rose-400 font-bold">
+                                    <i class="fa-solid fa-right-from-bracket mr-1"></i> Sign Out
+                                </button>
+                            </div>
+                        </div>
+                    </template>
+                    <template x-if="!currentUser">
+                        <button @click="showAuthModal = true" class="px-3 py-2 rounded-xl bg-vj-purple text-white text-xs font-bold shadow-glow-purple hover:opacity-90 transition">
+                            <i class="fa-solid fa-user-lock mr-1"></i> Login / Sign Up
+                        </button>
+                    </template>
+                </div>
+
+                <!-- TOP RIGHT ADMIN CONTROL PANEL BUTTON -->
+                <button @click="toggleAdminView()" :class="viewMode === 'admin' ? 'bg-vj-red text-white shadow-glow-red' : 'bg-gradient-to-r from-vj-purple to-vj-red text-white shadow-glow-purple'" class="px-3.5 py-2 rounded-xl text-xs font-extrabold transition flex items-center gap-1.5 hover:scale-105 border border-white/20">
+                    <i class="fa-solid" :class="viewMode === 'admin' ? 'fa-arrow-left' : 'fa-sliders'"></i>
+                    <span x-text="viewMode === 'admin' ? 'Client App' : 'Admin Panel'"></span>
+                </button>
+
+            </div>
+        </div>
+    </header>
+
+    <div x-show="!showSplash && activeAd && viewMode === 'client'" class="max-w-7xl mx-auto px-4 mt-2">
+        <div class="liquid-glass rounded-2xl p-3 md:p-4 border border-vj-gold/40 flex items-center justify-between gap-4 specular-border relative overflow-hidden group">
+            <div class="absolute inset-0 bg-gradient-to-r from-vj-gold/10 via-transparent to-vj-purple/10 pointer-events-none"></div>
+            
+            <div class="flex items-center gap-3 relative z-10">
+                <div class="w-10 h-10 rounded-xl bg-vj-gold/20 border border-vj-gold/50 flex items-center justify-center text-vj-gold shrink-0">
+                    <i class="fa-solid fa-rectangle-ad text-lg"></i>
+                </div>
+                <div>
+                    <div class="flex items-center gap-2">
+                        <span class="px-2 py-0.5 rounded bg-vj-gold text-obsidian font-black text-[9px] uppercase">ADVERT</span>
+                        <h4 class="text-xs font-bold text-white" x-text="activeAd.title"></h4>
+                    </div>
+                    <p class="text-[11px] text-slate-300" x-text="activeAd.description"></p>
+                </div>
+            </div>
+
+            <div class="flex items-center gap-3 relative z-10">
+                <a :href="activeAd.link" target="_blank" @click="trackAdClick(activeAd)" class="px-4 py-2 rounded-xl bg-vj-gold text-obsidian text-xs font-black hover:scale-105 transition">
+                    Learn More
+                </a>
+                <button @click="dismissAd()" class="text-slate-400 hover:text-white p-1">
+                    <i class="fa-solid fa-xmark text-sm"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <main x-show="!showSplash && viewMode === 'client'" class="flex-1 max-w-7xl mx-auto w-full p-4 space-y-8">
+
+        <!-- Client Sub-Header Tabs -->
+        <div class="flex items-center gap-2 overflow-x-auto pb-2 scrollbar-none">
+            <button @click="currentTab = 'home'" :class="currentTab === 'home' ? 'bg-vj-purple text-white shadow-glow-purple font-bold' : 'liquid-glass text-slate-400 hover:text-white'" class="px-4 py-2 rounded-full text-xs transition shrink-0">
+                <i class="fa-solid fa-house mr-1.5"></i> All Movies
+            </button>
+            <button @click="currentTab = 'free'" :class="currentTab === 'free' ? 'bg-vj-emerald text-white font-bold' : 'liquid-glass text-slate-400 hover:text-white'" class="px-4 py-2 rounded-full text-xs transition shrink-0">
+                <i class="fa-solid fa-gift mr-1.5 text-vj-emerald"></i> 100% Free Movies
+            </button>
+            <button @click="currentTab = 'vj'" :class="currentTab === 'vj' ? 'bg-vj-cyan text-obsidian font-bold' : 'liquid-glass text-slate-400 hover:text-white'" class="px-4 py-2 rounded-full text-xs transition shrink-0">
+                <i class="fa-solid fa-microphone mr-1.5 text-vj-cyan"></i> VJ Luganda Audio
+            </button>
+            <button @click="currentTab = 'action'" :class="currentTab === 'action' ? 'bg-vj-red text-white font-bold' : 'liquid-glass text-slate-400 hover:text-white'" class="px-4 py-2 rounded-full text-xs transition shrink-0">
+                <i class="fa-solid fa-fire mr-1.5 text-vj-red"></i> Action & Martial Arts
+            </button>
+        </div>
+
+        <!-- Hero Featured Movie Card Banner -->
+        <template x-if="featuredMovie && currentTab === 'home' && !searchQuery">
+            <div class="relative w-full h-[380px] md:h-[480px] rounded-3xl overflow-hidden liquid-glass border border-white/20 specular-border shadow-2xl flex items-end p-6 md:p-10 group">
+                <img :src="featuredMovie.backdrop || featuredMovie.poster" :alt="featuredMovie.title" class="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition duration-700">
+                <div class="absolute inset-0 bg-gradient-to-t from-obsidian via-obsidian/60 to-transparent"></div>
+
+                <div class="relative z-10 space-y-3 max-w-2xl">
+                    <div class="flex items-center gap-2">
+                        <span class="px-3 py-1 rounded-full bg-vj-red text-white text-[10px] font-black uppercase tracking-wider shadow-glow-red">FEATURED TITLES</span>
+                        <span class="px-3 py-1 rounded-full bg-vj-purple/80 text-white text-[10px] font-bold" x-text="featuredMovie.vj || 'Original Audio'"></span>
+                        <span x-show="featuredMovie.isFree" class="px-3 py-1 rounded-full bg-vj-emerald text-white text-[10px] font-bold">100% FREE</span>
+                    </div>
+
+                    <h2 class="text-2xl md:text-5xl font-black text-white tracking-tight leading-none" x-text="featuredMovie.title"></h2>
+                    <p class="text-xs md:text-sm text-slate-300 line-clamp-2" x-text="featuredMovie.description"></p>
+
+                    <div class="flex items-center gap-3 pt-2">
+                        <button @click="playMovie(featuredMovie)" class="px-6 py-3 rounded-2xl bg-gradient-to-r from-vj-red via-vj-purple to-vj-cyan text-white text-xs font-black shadow-glow-red hover:scale-105 transition flex items-center gap-2">
+                            <i class="fa-solid fa-play text-sm"></i> Watch Now In Player
+                        </button>
+                        <button @click="openSubscriptionModal()" class="px-5 py-3 rounded-2xl liquid-glass text-vj-gold hover:bg-white/10 text-xs font-bold transition flex items-center gap-2">
+                            <i class="fa-solid fa-crown text-sm"></i> Get VIP Pass
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </template>
+
+        <!-- Movie Swimlanes Catalog Grid -->
+        <div class="space-y-6">
+            <div class="flex items-center justify-between border-b border-white/10 pb-3">
+                <h3 class="text-lg font-bold text-white flex items-center gap-2">
+                    <i class="fa-solid fa-film text-vj-purple"></i>
+                    <span x-text="getCatalogHeading()"></span>
+                </h3>
+                <span class="text-xs text-slate-400" x-text="filteredMovies.length + ' Movies Available'"></span>
+            </div>
+
+            <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 md:gap-6">
+                <template x-for="movie in filteredMovies" :key="movie.id">
+                    <div class="liquid-glass-card rounded-2xl overflow-hidden border border-white/10 hover:border-vj-purple/60 hover:scale-105 transition duration-300 group flex flex-col justify-between specular-border">
+                        
+                        <!-- Movie Poster Container -->
+                        <div class="relative aspect-[2/3] overflow-hidden bg-slate-900 cursor-pointer" @click="playMovie(movie)">
+                            <img :src="movie.poster" :alt="movie.title" class="w-full h-full object-cover group-hover:scale-110 transition duration-500">
+                            
+                            <!-- Badges -->
+                            <div class="absolute top-2 left-2 flex flex-col gap-1">
+                                <template x-if="movie.isFree">
+                                    <span class="px-2 py-0.5 rounded-full bg-vj-emerald text-white text-[9px] font-black uppercase">FREE</span>
+                                </template>
+                                <template x-if="!movie.isFree">
+                                    <span class="px-2 py-0.5 rounded-full bg-vj-gold text-obsidian text-[9px] font-black uppercase">VIP PASS</span>
+                                </template>
+                            </div>
+
+                            <div class="absolute top-2 right-2">
+                                <span class="px-2 py-0.5 rounded-md bg-black/60 backdrop-blur-md text-vj-purple border border-white/10 text-[9px] font-bold" x-text="movie.vj || 'Original'"></span>
+                            </div>
+
+                            <!-- Hover Overlay Play Button -->
+                            <div class="absolute inset-0 bg-obsidian/60 opacity-0 group-hover:opacity-100 transition duration-300 flex items-center justify-center">
+                                <div class="w-12 h-12 rounded-full bg-vj-red text-white flex items-center justify-center shadow-glow-red transform group-hover:scale-110 transition">
+                                    <i class="fa-solid fa-play ml-0.5"></i>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Movie Info Footer -->
+                        <div class="p-3 space-y-1">
+                            <h4 class="font-bold text-white text-xs truncate" x-text="movie.title"></h4>
+                            <div class="flex items-center justify-between text-[10px] text-slate-400">
+                                <span x-text="movie.year + ' • ' + (movie.rating || 'PG-13')"></span>
+                                <span class="text-vj-cyan font-semibold" x-text="movie.category"></span>
+                            </div>
+                        </div>
+
+                    </div>
+                </template>
+            </div>
+        </div>
+
+    </main>
+
+    <main x-show="!showSplash && viewMode === 'admin'" class="flex-1 max-w-7xl mx-auto w-full p-4 md:p-6 space-y-6">
+
+        <!-- Admin Control Header Banner -->
+        <div class="liquid-glass rounded-3xl p-6 border border-vj-purple/40 flex flex-col md:flex-row items-start md:items-center justify-between gap-4 specular-border shadow-2xl">
+            <div>
+                <div class="flex items-center gap-2">
+                    <span class="px-3 py-0.5 rounded-full bg-vj-purple text-white text-[10px] font-black uppercase">ADMIN CMS</span>
+                    <h2 class="text-xl md:text-2xl font-black text-white">SAHEL BACKOFFICE DASHBOARD</h2>
+                </div>
+                <p class="text-xs text-slate-400 mt-1">Manage movies, local storage uploads, Mobile Money verification desk & users</p>
+            </div>
+
+            <!-- Admin Nav Tabs -->
+            <div class="flex items-center gap-2 overflow-x-auto w-full md:w-auto">
+                <button @click="adminTab = 'analytics'" :class="adminTab === 'analytics' ? 'bg-vj-purple text-white' : 'liquid-glass text-slate-400'" class="px-3 py-2 rounded-xl text-xs font-bold transition">
+                    <i class="fa-solid fa-chart-pie mr-1"></i> Analytics
+                </button>
+                <button @click="adminTab = 'cms'" :class="adminTab === 'cms' ? 'bg-vj-purple text-white' : 'liquid-glass text-slate-400'" class="px-3 py-2 rounded-xl text-xs font-bold transition">
+                    <i class="fa-solid fa-film mr-1"></i> Movies CMS
+                </button>
+                <button @click="adminTab = 'payments'" :class="adminTab === 'payments' ? 'bg-vj-purple text-white' : 'liquid-glass text-slate-400'" class="px-3 py-2 rounded-xl text-xs font-bold transition relative">
+                    <i class="fa-solid fa-receipt mr-1"></i> Payments
+                    <template x-if="pendingPayments.length > 0">
+                        <span class="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-vj-red text-white text-[9px] font-bold flex items-center justify-center" x-text="pendingPayments.length"></span>
+                    </template>
+                </button>
+                <button @click="adminTab = 'users'" :class="adminTab === 'users' ? 'bg-vj-purple text-white' : 'liquid-glass text-slate-400'" class="px-3 py-2 rounded-xl text-xs font-bold transition">
+                    <i class="fa-solid fa-users mr-1"></i> Users
+                </button>
+                <button @click="adminTab = 'ads'" :class="adminTab === 'ads' ? 'bg-vj-purple text-white' : 'liquid-glass text-slate-400'" class="px-3 py-2 rounded-xl text-xs font-bold transition">
+                    <i class="fa-solid fa-rectangle-ad mr-1"></i> Ad Manager
+                </button>
+            </div>
+        </div>
+
+        <!-- Admin Tab: Analytics KPI Cards -->
+        <div x-show="adminTab === 'analytics'" class="space-y-6">
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                <div class="liquid-glass rounded-3xl p-5 border border-white/10 specular-border">
+                    <span class="text-xs text-slate-400">Total MoMo Revenue</span>
+                    <h3 class="text-2xl font-black text-vj-gold" x-text="formatUGX(totalRevenue)"></h3>
+                    <p class="text-[10px] text-vj-emerald font-bold mt-1"><i class="fa-solid fa-arrow-trend-up"></i> Airtel Merchant & MTN Direct</p>
+                </div>
+                <div class="liquid-glass rounded-3xl p-5 border border-white/10 specular-border">
+                    <span class="text-xs text-slate-400">Total Registered Users</span>
+                    <h3 class="text-2xl font-black text-white" x-text="usersList.length"></h3>
+                    <p class="text-[10px] text-vj-cyan font-bold mt-1" x-text="getVipCount() + ' Active VIP Subscriptions'"></p>
+                </div>
+                <div class="liquid-glass rounded-3xl p-5 border border-white/10 specular-border">
+                    <span class="text-xs text-slate-400">Pending Approvals</span>
+                    <h3 class="text-2xl font-black text-vj-red" x-text="pendingPayments.length"></h3>
+                    <p class="text-[10px] text-slate-400 mt-1">Manual payment desk queue</p>
+                </div>
+                <div class="liquid-glass rounded-3xl p-5 border border-white/10 specular-border">
+                    <span class="text-xs text-slate-400">Movies Catalog</span>
+                    <h3 class="text-2xl font-black text-white" x-text="moviesCatalog.length"></h3>
+                    <p class="text-[10px] text-vj-purple font-bold mt-1" x-text="getVjCount() + ' VJ Luganda Voiceovers'"></p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Admin Tab: Movie & Local Storage Upload CMS -->
+        <div x-show="adminTab === 'cms'" class="space-y-6">
+            <div class="flex items-center justify-between">
+                <h3 class="text-base font-bold text-white"><i class="fa-solid fa-cloud-arrow-up text-vj-cyan mr-2"></i> Local Storage & Stream Links Upload CMS</h3>
+                <button @click="openMovieModal()" class="px-4 py-2 rounded-xl bg-vj-purple text-white text-xs font-bold shadow-glow-purple flex items-center gap-2">
+                    <i class="fa-solid fa-plus"></i> Upload New Movie / Cover
+                </button>
+            </div>
+
+            <!-- Movies Table -->
+            <div class="liquid-glass rounded-3xl p-4 border border-white/10 overflow-x-auto specular-border">
+                <table class="w-full text-left text-xs text-slate-300">
+                    <thead class="text-slate-400 border-b border-white/10 uppercase font-bold text-[10px]">
+                        <tr>
+                            <th class="p-3">Poster & Movie Title</th>
+                            <th class="p-3">VJ Translator</th>
+                            <th class="p-3">Source Type</th>
+                            <th class="p-3">Access Tier</th>
+                            <th class="p-3 text-right">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-white/5">
+                        <template x-for="movie in moviesCatalog" :key="movie.id">
+                            <tr class="hover:bg-white/5 transition">
+                                <td class="p-3">
+                                    <div class="flex items-center gap-3">
+                                        <img :src="movie.poster" :alt="movie.title" class="w-10 h-14 object-cover rounded-xl border border-white/10">
+                                        <div>
+                                            <h4 class="font-bold text-white text-xs" x-text="movie.title"></h4>
+                                            <p class="text-[10px] text-slate-400 truncate max-w-[180px]" x-text="movie.description"></p>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="p-3 font-semibold text-vj-purple" x-text="movie.vj || 'Original Audio'"></td>
+                                <td class="p-3">
+                                    <span class="px-2.5 py-1 rounded-full text-[10px] font-bold font-mono" :class="movie.isLocalFile ? 'bg-vj-cyan/20 text-vj-cyan border border-vj-cyan/40' : 'bg-slate-800 text-slate-300'" x-text="movie.isLocalFile ? 'LOCAL FILE (Blob)' : 'WEB STREAM URL'"></span>
+                                </td>
+                                <td class="p-3">
+                                    <span class="px-2.5 py-1 rounded-full text-[10px] font-bold" :class="movie.isFree ? 'bg-vj-emerald/20 text-vj-emerald border border-vj-emerald/40' : 'bg-vj-gold/20 text-vj-gold border border-vj-gold/40'" x-text="movie.isFree ? '100% FREE' : 'VIP PASS'"></span>
+                                </td>
+                                <td class="p-3 text-right">
+                                    <div class="flex items-center justify-end gap-2">
+                                        <button @click="editMovie(movie)" class="p-2 rounded-xl bg-slate-800 hover:bg-vj-purple text-white transition"><i class="fa-solid fa-pen"></i></button>
+                                        <button @click="deleteMovie(movie.id)" class="p-2 rounded-xl bg-slate-800 hover:bg-vj-red text-white transition"><i class="fa-solid fa-trash"></i></button>
+                                    </div>
+                                </td>
+                            </tr>
+                        </template>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Admin Tab: Payment Verification Desk -->
+        <div x-show="adminTab === 'payments'" class="space-y-6">
+            <div class="liquid-glass rounded-3xl p-6 border border-white/10 space-y-4 specular-border">
+                <div class="flex items-center justify-between border-b border-white/10 pb-4">
+                    <div>
+                        <h3 class="text-base font-bold text-white flex items-center gap-2"><i class="fa-solid fa-receipt text-vj-gold"></i> Mobile Money Verification Desk</h3>
+                        <p class="text-xs text-slate-400">Airtel Merchant Code: <strong class="text-vj-cyan font-mono">6967790 (Sahel Main)</strong> | MTN: <strong class="text-vj-cyan font-mono">0744902535</strong></p>
+                    </div>
+
+                    <!-- Auto Verify Toggle Switch -->
+                    <div class="flex items-center gap-2 bg-black/40 px-3 py-1.5 rounded-full border border-white/10">
+                        <span class="text-xs font-bold text-slate-300">Auto-Verify Mode:</span>
+                        <button @click="settings.autoVerify = !settings.autoVerify; saveSettings()" class="w-10 h-5 rounded-full transition relative p-0.5" :class="settings.autoVerify ? 'bg-vj-emerald' : 'bg-slate-700'">
+                            <div class="w-4 h-4 rounded-full bg-white transition transform" :class="settings.autoVerify ? 'translate-x-5' : 'translate-x-0'"></div>
+                        </button>
+                    </div>
+                </div>
+
+                <template x-if="pendingPayments.length === 0">
+                    <div class="p-12 text-center text-slate-400">
+                        <i class="fa-solid fa-circle-check text-4xl text-vj-emerald/60 mb-2"></i>
+                        <p class="text-xs font-semibold">No pending Mobile Money verifications!</p>
+                    </div>
+                </template>
+
+                <div class="space-y-3" x-show="pendingPayments.length > 0">
+                    <template x-for="pay in pendingPayments" :key="pay.id">
+                        <div class="liquid-glass-card rounded-2xl p-4 border border-white/10 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+                            <div class="space-y-1">
+                                <div class="flex items-center gap-2">
+                                    <span class="px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase" :class="pay.carrier === 'Airtel Merchant' ? 'bg-red-600 text-white' : 'bg-yellow-400 text-black'" x-text="pay.carrier"></span>
+                                    <span class="text-xs text-white font-bold" x-text="pay.userName + ' (' + pay.userPhone + ')'"></span>
+                                </div>
+                                <p class="text-xs text-slate-300">
+                                    Amount: <strong class="text-vj-gold" x-text="formatUGX(pay.amount)"></strong> | 
+                                    Ref Code: <strong class="text-vj-cyan font-mono bg-black/40 px-2 py-0.5 rounded" x-text="pay.refId"></strong>
+                                </p>
+                            </div>
+                            <div class="flex items-center gap-2 w-full md:w-auto">
+                                <button @click="approvePayment(pay)" class="flex-1 md:flex-initial px-4 py-2 rounded-xl bg-vj-emerald text-white text-xs font-bold hover:opacity-90">Approve & VIP</button>
+                                <button @click="rejectPayment(pay)" class="flex-1 md:flex-initial px-4 py-2 rounded-xl bg-rose-950 text-rose-300 border border-rose-800 text-xs font-bold">Reject</button>
+                            </div>
+                        </div>
+                    </template>
+                </div>
+            </div>
+        </div>
+
+        <!-- Admin Tab: User Management -->
+        <div x-show="adminTab === 'users'" class="space-y-6">
+            <div class="liquid-glass rounded-3xl p-4 border border-white/10 overflow-x-auto specular-border">
+                <table class="w-full text-left text-xs text-slate-300">
+                    <thead class="text-slate-400 border-b border-white/10 uppercase font-bold text-[10px]">
+                        <tr>
+                            <th class="p-3">User</th>
+                            <th class="p-3">Phone</th>
+                            <th class="p-3">VIP Status</th>
+                            <th class="p-3 text-right">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-white/5">
+                        <template x-for="user in usersList" :key="user.email">
+                            <tr class="hover:bg-white/5">
+                                <td class="p-3 font-bold text-white" x-text="user.name + ' (' + user.email + ')'"></td>
+                                <td class="p-3 font-mono" x-text="user.phone || 'N/A'"></td>
+                                <td class="p-3">
+                                    <span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold" :class="user.isVip ? 'bg-vj-gold/20 text-vj-gold border border-vj-gold/40' : 'bg-slate-800 text-slate-400'" x-text="user.isVip ? 'VIP ACTIVE' : 'FREE USER'"></span>
+                                </td>
+                                <td class="p-3 text-right">
+                                    <button @click="toggleUserVip(user)" class="px-3 py-1.5 rounded-xl text-[10px] font-bold" :class="user.isVip ? 'bg-rose-950 text-rose-300' : 'bg-vj-purple text-white'" x-text="user.isVip ? 'Revoke VIP' : 'Grant Free VIP'"></button>
+                                </td>
+                            </tr>
+                        </template>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Admin Tab: Developer Info Editor -->
+        <div x-show="adminTab === 'ads'" class="space-y-6">
+            <div class="liquid-glass rounded-3xl p-6 border border-white/10 space-y-4 specular-border">
+                <h3 class="text-base font-bold text-white"><i class="fa-solid fa-code text-vj-gold mr-2"></i> Edit Developer Profile Modal Content</h3>
+                <div class="space-y-3 text-xs">
+                    <div>
+                        <label class="block text-slate-400 mb-1">Developer Name</label>
+                        <input type="text" x-model="devInfo.name" class="w-full bg-slate-900/80 rounded-xl p-3 border border-white/10 text-white">
+                    </div>
+                    <div>
+                        <label class="block text-slate-400 mb-1">Bio / Credentials</label>
+                        <textarea x-model="devInfo.bio" rows="3" class="w-full bg-slate-900/80 rounded-xl p-3 border border-white/10 text-white"></textarea>
+                    </div>
+                    <div>
+                        <label class="block text-slate-400 mb-1">Contact Phone / WhatsApp</label>
+                        <input type="text" x-model="devInfo.phone" class="w-full bg-slate-900/80 rounded-xl p-3 border border-white/10 text-white">
+                    </div>
+                    <button @click="saveSettings()" class="px-5 py-2.5 rounded-full bg-vj-purple text-white font-bold">Save Dev Profile</button>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <div x-show="showPlayerModal" x-transition.opacity class="fixed inset-0 z-50 bg-obsidian/95 backdrop-blur-3xl flex items-center justify-center p-2 md:p-6" x-cloak>
+        <div class="relative w-full max-w-5xl liquid-glass rounded-3xl overflow-hidden border border-white/20 shadow-2xl space-y-3 p-4 specular-border">
+            
+            <div class="flex items-center justify-between pb-2 border-b border-white/10">
+                <div class="flex items-center gap-2">
+                    <span class="px-2.5 py-0.5 rounded-full bg-vj-red text-white text-[10px] font-black uppercase">NATIVE PLAYER</span>
+                    <h3 class="text-sm font-bold text-white truncate max-w-md" x-text="activePlayingMovie?.title"></h3>
+                </div>
+                <button @click="closePlayer()" class="w-8 h-8 rounded-full bg-slate-800 text-slate-300 hover:text-white flex items-center justify-center">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+
+            <!-- Native HTML5 Video Display Wrapper -->
+            <div class="relative aspect-video bg-black rounded-2xl overflow-hidden border border-white/10 group">
+                <template x-if="activePlayingMovie && activePlayingMovie.isLocalFile">
+                    <video id="nativeVideoPlayer" controls class="w-full h-full object-contain" :src="activePlayingMovie.streamUrl"></video>
+                </template>
+                <template x-if="activePlayingMovie && !activePlayingMovie.isLocalFile">
+                    <iframe :src="activePlayingMovie.streamUrl" class="w-full h-full border-0" allow="autoplay; encrypted-media; fullscreen" allowfullscreen></iframe>
+                </template>
+            </div>
+
+            <div class="flex items-center justify-between text-xs text-slate-400 pt-1">
+                <p>VJ Voiceover: <strong class="text-vj-purple" x-text="activePlayingMovie?.vj || 'Original'"></strong></p>
+                <p class="text-[10px]">SAHEL High-Speed Stream Node</p>
+            </div>
+        </div>
+    </div>
+
+    <div x-show="showAuthModal" x-transition.opacity class="fixed inset-0 z-50 bg-obsidian/90 backdrop-blur-2xl flex items-center justify-center p-4" x-cloak>
+        <div class="relative w-full max-w-md liquid-glass rounded-3xl p-6 md:p-8 border border-white/20 shadow-2xl space-y-6 specular-border">
+            
+            <button @click="showAuthModal = false" class="absolute top-4 right-4 text-slate-400 hover:text-white">
+                <i class="fa-solid fa-xmark text-lg"></i>
+            </button>
+
+            <div class="text-center space-y-1">
+                <h3 class="text-xl font-black text-white">SAHEL MOVIES ACCOUNT</h3>
+                <p class="text-xs text-slate-400">Mandatory account login required to stream movies</p>
+            </div>
+
+            <form @submit.prevent="handleAuthSubmit()" class="space-y-4 text-xs">
+                <template x-if="isSignUp">
+                    <div>
+                        <label class="block text-slate-400 mb-1">Full Name</label>
+                        <input type="text" x-model="authForm.name" required placeholder="e.g. Mukasa Dennis" class="w-full bg-slate-900/80 rounded-xl p-3 border border-white/10 text-white">
+                    </div>
+                </template>
+
+                <div>
+                    <label class="block text-slate-400 mb-1">Email Address</label>
+                    <input type="email" x-model="authForm.email" required placeholder="user@gmail.com" class="w-full bg-slate-900/80 rounded-xl p-3 border border-white/10 text-white">
+                </div>
+
+                <div>
+                    <label class="block text-slate-400 mb-1">Phone Number (MTN / Airtel)</label>
+                    <input type="tel" x-model="authForm.phone" required placeholder="0771234567" class="w-full bg-slate-900/80 rounded-xl p-3 border border-white/10 text-white">
+                </div>
+
+                <div>
+                    <label class="block text-slate-400 mb-1">Password</label>
+                    <input type="password" x-model="authForm.password" required class="w-full bg-slate-900/80 rounded-xl p-3 border border-white/10 text-white">
+                </div>
+
+                <button type="submit" class="w-full py-3 rounded-2xl bg-gradient-to-r from-vj-purple to-vj-red text-white font-bold shadow-glow-purple">
+                    <span x-text="isSignUp ? 'Create Free Account' : 'Sign In To Stream'"></span>
+                </button>
+
+                <div class="text-center pt-2">
+                    <button type="button" @click="isSignUp = !isSignUp" class="text-vj-cyan hover:underline">
+                        <span x-text="isSignUp ? 'Already have an account? Sign In' : 'Need an account? Sign Up Free'"></span>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div x-show="showSubModal" x-transition.opacity class="fixed inset-0 z-50 bg-obsidian/90 backdrop-blur-2xl flex items-center justify-center p-4 overflow-y-auto" x-cloak>
+        <div class="relative w-full max-w-lg liquid-glass rounded-3xl p-6 md:p-8 border border-white/20 shadow-2xl space-y-6 specular-border my-8">
+            
+            <button @click="showSubModal = false" class="absolute top-4 right-4 text-slate-400 hover:text-white">
+                <i class="fa-solid fa-xmark text-lg"></i>
+            </button>
+
+            <div class="text-center space-y-1">
+                <div class="w-12 h-12 rounded-2xl bg-vj-gold/20 text-vj-gold flex items-center justify-center text-xl mx-auto border border-vj-gold/40">
+                    <i class="fa-solid fa-crown"></i>
+                </div>
+                <h3 class="text-xl font-black text-white">UPGRADE TO VIP PASS</h3>
+                <p class="text-xs text-slate-400">Unlock all translated VJ Movies with Mobile Money</p>
+            </div>
+
+            <!-- MoMo Payment Instructions Banner -->
+            <div class="space-y-2 p-4 rounded-2xl bg-black/40 border border-white/10 text-xs">
+                <p class="text-vj-gold font-bold">Official Payment Destinations:</p>
+                
+                <div class="p-2.5 rounded-xl bg-red-950/40 border border-red-500/30 flex items-center justify-between">
+                    <div>
+                        <p class="font-bold text-white">Airtel Merchant Pay</p>
+                        <p class="text-[10px] text-slate-400">Merchant Code: <strong class="text-vj-cyan font-mono text-xs">6967790</strong></p>
+                    </div>
+                    <span class="text-[10px] font-bold text-slate-300">Name: Sahel Main</span>
+                </div>
+
+                <div class="p-2.5 rounded-xl bg-yellow-950/40 border border-yellow-500/30 flex items-center justify-between">
+                    <div>
+                        <p class="font-bold text-white">MTN Direct Mobile Money</p>
+                        <p class="text-[10px] text-slate-400">Numbers: <strong class="text-vj-cyan font-mono text-xs">0744902535 / 0730166745</strong></p>
+                    </div>
+                    <span class="text-[10px] font-bold text-slate-300">Ssemujju M. Sahel</span>
+                </div>
+            </div>
+
+            <form @submit.prevent="submitMobileMoneyPayment()" class="space-y-4 text-xs">
+                <div>
+                    <label class="block text-slate-400 mb-1">Select VIP Plan</label>
+                    <select x-model="subForm.plan" class="w-full bg-slate-900/80 rounded-xl p-3 border border-white/10 text-white font-bold">
+                        <option value="daily">Daily VIP Pass - UGX 1,500</option>
+                        <option value="weekly">Weekly VIP Pass - UGX 7,000</option>
+                        <option value="monthly">Monthly VIP Pass - UGX 22,000</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label class="block text-slate-400 mb-1">Payment Method Used</label>
+                    <select x-model="subForm.carrier" class="w-full bg-slate-900/80 rounded-xl p-3 border border-white/10 text-white font-bold">
+                        <option value="Airtel Merchant">Airtel Merchant (6967790)</option>
+                        <option value="MTN Direct">MTN Mobile Money (0744902535)</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label class="block text-slate-400 mb-1">Transaction Ref / ID Code</label>
+                    <input type="text" x-model="subForm.refId" required placeholder="e.g. 10293848123" class="w-full bg-slate-900/80 rounded-xl p-3 border border-white/10 text-white font-mono uppercase">
+                </div>
+
+                <button type="submit" class="w-full py-3 rounded-2xl bg-vj-gold text-obsidian font-black text-xs shadow-lg">
+                    Submit Payment For Verification
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <div x-show="showMovieModal" x-transition.opacity class="fixed inset-0 z-50 bg-obsidian/90 backdrop-blur-2xl flex items-center justify-center p-4 overflow-y-auto" x-cloak>
+        <div class="relative w-full max-w-2xl liquid-glass rounded-3xl p-6 md:p-8 border border-white/20 shadow-2xl space-y-6 specular-border my-8">
+            
+            <div class="flex items-center justify-between border-b border-white/10 pb-4">
+                <h3 class="text-lg font-bold text-white flex items-center gap-2">
+                    <i class="fa-solid fa-cloud-arrow-up text-vj-purple"></i>
+                    <span x-text="isEditingMovie ? 'Edit Movie' : 'Upload Local Storage Movie / Stream Link'"></span>
+                </h3>
+                <button @click="showMovieModal = false" class="text-slate-400 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
+            </div>
+
+            <form @submit.prevent="saveMovieCMS()" class="space-y-4 text-xs">
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-slate-400 mb-1">Movie Title</label>
+                        <input type="text" x-model="activeMovieForm.title" required placeholder="e.g. Extraction 2" class="w-full bg-slate-900/80 rounded-xl p-3 border border-white/10 text-white">
+                    </div>
+
+                    <div>
+                        <label class="block text-slate-400 mb-1">VJ Translator</label>
+                        <select x-model="activeMovieForm.vj" class="w-full bg-slate-900/80 rounded-xl p-3 border border-white/10 text-white">
+                            <option value="VJ Junior">VJ Junior</option>
+                            <option value="VJ Ice P">VJ Ice P</option>
+                            <option value="VJ Mark">VJ Mark</option>
+                            <option value="VJ Jingo">VJ Jingo</option>
+                            <option value="VJ Emmy">VJ Emmy</option>
+                            <option value="">Original Audio</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Local File Upload Selector Block -->
+                <div class="p-4 rounded-2xl bg-black/40 border border-vj-cyan/30 space-y-3">
+                    <p class="font-bold text-vj-cyan flex items-center gap-2">
+                        <i class="fa-solid fa-hard-drive"></i> Upload Video File From Local Storage
+                    </p>
+                    
+                    <div class="flex flex-col md:flex-row items-center gap-3">
+                        <input type="file" accept="video/*" @change="handleVideoFileUpload($event)" class="w-full text-slate-300 text-xs file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-vj-purple file:text-white hover:file:opacity-90">
+                    </div>
+                    
+                    <p class="text-[10px] text-slate-400">OR provide a Web Stream URL fallback below:</p>
+                    <input type="text" x-model="activeMovieForm.streamUrl" placeholder="https://domain.com/video.mp4 or embed link" class="w-full bg-slate-900 rounded-xl p-2.5 text-white border border-white/10">
+                </div>
+
+                <!-- Local Poster Image Selector -->
+                <div class="p-4 rounded-2xl bg-black/40 border border-vj-gold/30 space-y-3">
+                    <p class="font-bold text-vj-gold flex items-center gap-2">
+                        <i class="fa-solid fa-image"></i> Upload Cover Artwork Poster Image
+                    </p>
+                    
+                    <input type="file" accept="image/*" @change="handlePosterFileUpload($event)" class="w-full text-slate-300 text-xs file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-vj-gold file:text-obsidian hover:file:opacity-90">
+                    
+                    <input type="url" x-model="activeMovieForm.poster" placeholder="Or paste Poster Image URL" class="w-full bg-slate-900 rounded-xl p-2.5 text-white border border-white/10">
+                </div>
+
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-slate-400 mb-1">Access Tier</label>
+                        <select x-model="activeMovieForm.isFree" class="w-full bg-slate-900/80 rounded-xl p-3 border border-white/10 text-white">
+                            <option :value="false">Requires VIP Pass</option>
+                            <option :value="true">100% FREE Title</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="block text-slate-400 mb-1">Category</label>
+                        <select x-model="activeMovieForm.category" class="w-full bg-slate-900/80 rounded-xl p-3 border border-white/10 text-white">
+                            <option value="VJ Luganda Translated">VJ Luganda Translated</option>
+                            <option value="Action & Martial Arts">Action & Martial Arts</option>
+                            <option value="Drama & Nollywood">Drama & Nollywood</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-slate-400 mb-1">Synopsis</label>
+                    <textarea x-model="activeMovieForm.description" rows="2" class="w-full bg-slate-900/80 rounded-xl p-3 border border-white/10 text-white"></textarea>
+                </div>
+
+                <div class="flex items-center justify-end gap-3 pt-2">
+                    <button type="button" @click="showMovieModal = false" class="px-5 py-2.5 rounded-full bg-slate-800 text-slate-300">Cancel</button>
+                    <button type="submit" class="px-6 py-2.5 rounded-full bg-vj-purple text-white font-bold shadow-glow-purple">
+                        Save Movie Changes
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div x-show="showDevModal" x-transition.opacity class="fixed inset-0 z-50 bg-obsidian/90 backdrop-blur-2xl flex items-center justify-center p-4" x-cloak>
+        <div class="relative w-full max-w-md liquid-glass rounded-3xl p-6 md:p-8 border border-white/20 shadow-2xl space-y-6 specular-border text-center">
+            
+            <button @click="showDevModal = false" class="absolute top-4 right-4 text-slate-400 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
+
+            <div class="w-20 h-20 mx-auto rounded-3xl bg-gradient-to-tr from-vj-purple via-vj-red to-vj-gold p-0.5 shadow-glow-purple">
+                <div class="w-full h-full bg-obsidian rounded-[22px] flex items-center justify-center text-vj-gold text-3xl font-black">
+                    SMS
+                </div>
+            </div>
+
+            <div class="space-y-1">
+                <h3 class="text-xl font-black text-white" x-text="devInfo.name"></h3>
+                <p class="text-xs text-vj-cyan font-bold">PLATFORM OWNER & LEAD DEVELOPER</p>
+            </div>
+
+            <p class="text-xs text-slate-300 bg-black/40 p-4 rounded-2xl border border-white/10 leading-relaxed" x-text="devInfo.bio"></p>
+
+            <div class="pt-2 text-xs text-slate-400 space-y-1">
+                <p>Official Contact: <strong class="text-white" x-text="devInfo.phone"></strong></p>
+                <p>Location: Kampala, Uganda</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function sahelApp() {
+            return {
+                showSplash: true,
+                splashProgress: 0,
+                viewMode: 'client', // 'client' | 'admin'
+                adminTab: 'analytics',
+                currentTab: 'home',
+                searchQuery: '',
+                showAuthModal: false,
+                showSubModal: false,
+                showMovieModal: false,
+                showPlayerModal: false,
+                showDevModal: false,
+                showUserMenu: false,
+                isSignUp: false,
+                toasts: [],
+
+                currentUser: null,
+                activePlayingMovie: null,
+                isEditingMovie: false,
+
+                // Dev Info Tile Data
+                devInfo: {
+                    name: 'Ssemujju Muhammad Sahel',
+                    bio: 'Owner and architect of SAHEL MOVIES Uganda. Pioneer in delivering high-speed VJ Luganda translated cinema directly to viewers.',
+                    phone: '0744902535 / 0730166745'
+                },
+
+                // System Settings
+                settings: {
+                    autoVerify: false,
+                    airtelMerchant: '6967790',
+                    mtnDirect: '0744902535'
+                },
+
+                // Forms
+                authForm: { name: '', email: '', phone: '', password: '' },
+                subForm: { plan: 'weekly', carrier: 'Airtel Merchant', refId: '' },
+                activeMovieForm: { id: null, title: '', vj: 'VJ Junior', category: 'VJ Luganda Translated', isFree: false, streamUrl: '', poster: '', isLocalFile: false, description: '' },
+
+                // Active Ad
+                activeAd: {
+                    id: 'ad1',
+                    title: 'Sahel Comics & Graphics',
+                    description: 'Get custom movie posters & artwork design in Kampala!',
+                    link: '#'
+                },
+
+                totalRevenue: 420000,
+
+                // Pending Payments Queue
+                pendingPayments: [
+                    { id: 'p1', userName: 'Mukasa Ronald', userPhone: '0778123456', carrier: 'Airtel Merchant', amount: 7000, refId: 'ART9810293', plan: 'Weekly VIP' }
+                ],
+
+                // Users
+                usersList: [
+                    { name: 'Ssemujju M. Sahel', email: 'sahel@movies.ug', phone: '0744902535', isVip: true },
+                    { name: 'Kato Paul', email: 'kato@gmail.com', phone: '0751234567', isVip: false }
+                ],
+
+                // Movies Catalog
+                moviesCatalog: [
+                    {
+                        id: 'm1',
+                        title: 'Extraction 2 (VJ Junior)',
+                        vj: 'VJ Junior',
+                        category: 'VJ Luganda Translated',
+                        year: '2023',
+                        rating: '18+',
+                        isFree: false,
+                        poster: 'https://images.unsplash.com/photo-1536440136628-849c177e76a1?auto=format&fit=crop&w=600&q=80',
+                        streamUrl: 'https://www.w3schools.com/html/mov_bbb.mp4',
+                        isLocalFile: true,
+                        description: 'Action-packed VJ Junior voiceover translation.'
+                    },
+                    {
+                        id: 'm2',
+                        title: 'John Wick 4 (VJ Ice P)',
+                        vj: 'VJ Ice P',
+                        category: 'Action & Martial Arts',
+                        year: '2023',
+                        rating: '18+',
+                        isFree: true,
+                        poster: 'https://images.unsplash.com/photo-1517604931442-7e0c8ed2963c?auto=format&fit=crop&w=600&q=80',
+                        streamUrl: 'https://www.w3schools.com/html/mov_bbb.mp4',
+                        isLocalFile: true,
+                        description: 'Non-stop martial arts translated in Luganda.'
+                    },
+                    {
+                        id: 'm3',
+                        title: 'Kampala Heat (Ugandan Drama)',
+                        vj: 'VJ Mark',
+                        category: 'VJ Luganda Translated',
+                        year: '2024',
+                        rating: '16+',
+                        isFree: true,
+                        poster: 'https://images.unsplash.com/photo-1485846234645-a62644f84728?auto=format&fit=crop&w=600&q=80',
+                        streamUrl: 'https://www.w3schools.com/html/mov_bbb.mp4',
+                        isLocalFile: true,
+                        description: '100% Free movie translated by VJ Mark.'
+                    }
+                ],
+
+                initApp() {
+                    // 4-second animated splash screen
+                    const interval = setInterval(() => {
+                        this.splashProgress += 2.5;
+                        if (this.splashProgress >= 100) {
+                            clearInterval(interval);
+                            setTimeout(() => { this.showSplash = false; }, 300);
+                        }
+                    }, 100);
+                },
+
+                get featuredMovie() {
+                    return this.moviesCatalog[0];
+                },
+
+                get filteredMovies() {
+                    return this.moviesCatalog.filter(m => {
+                        const matchesSearch = m.title.toLowerCase().includes(this.searchQuery.toLowerCase()) || 
+                                              (m.vj && m.vj.toLowerCase().includes(this.searchQuery.toLowerCase()));
+                        
+                        if (this.currentTab === 'free') return matchesSearch && m.isFree;
+                        if (this.currentTab === 'vj') return matchesSearch && m.vj;
+                        if (this.currentTab === 'action') return matchesSearch && m.category.includes('Action');
+                        return matchesSearch;
+                    });
+                },
+
+                getCatalogHeading() {
+                    if (this.currentTab === 'free') return '100% Free Movies (No VIP Required)';
+                    if (this.currentTab === 'vj') return 'VJ Luganda Translated Voiceovers';
+                    if (this.currentTab === 'action') return 'Action & Martial Arts Collection';
+                    return 'Complete SAHEL Movies Catalog';
+                },
+
+                // Mandatory Account Stream Gate & Player Trigger
+                playMovie(movie) {
+                    if (!movie.isFree && (!this.currentUser || !this.currentUser.isVip)) {
+                        if (!this.currentUser) {
+                            this.notify('info', 'Account Required', 'Please sign in or create an account to watch');
+                            this.showAuthModal = true;
+                        } else {
+                            this.notify('gold', 'VIP Pass Required', 'Upgrade your account using Mobile Money');
+                            this.openSubscriptionModal();
+                        }
+                        return;
+                    }
+
+                    this.activePlayingMovie = movie;
+                    this.showPlayerModal = true;
+                },
+
+                closePlayer() {
+                    this.showPlayerModal = false;
+                    this.activePlayingMovie = null;
+                },
+
+                toggleAdminView() {
+                    this.viewMode = this.viewMode === 'client' ? 'admin' : 'client';
+                    this.notify('info', 'View Switched', 'Now viewing ' + (this.viewMode === 'admin' ? 'Admin Backoffice' : 'Client Website'));
+                },
+
+                // Auth Handlers
+                handleAuthSubmit() {
+                    this.currentUser = {
+                        name: this.authForm.name || 'Sahel User',
+                        email: this.authForm.email,
+                        phone: this.authForm.phone,
+                        isVip: false
+                    };
+                    this.usersList.push(this.currentUser);
+                    this.showAuthModal = false;
+                    this.notify('success', 'Welcome!', 'Signed in as ' + this.currentUser.name);
+                },
+
+                logout() {
+                    this.currentUser = null;
+                    this.showUserMenu = false;
+                    this.notify('info', 'Signed Out', 'You have been logged out');
+                },
+
+                openSubscriptionModal() {
+                    this.showSubModal = true;
+                },
+
+                submitMobileMoneyPayment() {
+                    const payObj = {
+                        id: 'p_' + Date.now(),
+                        userName: this.currentUser ? this.currentUser.name : 'Guest User',
+                        userPhone: this.currentUser ? this.currentUser.phone : '0770000000',
+                        carrier: this.subForm.carrier,
+                        amount: this.subForm.plan === 'daily' ? 1500 : (this.subForm.plan === 'weekly' ? 7000 : 22000),
+                        refId: this.subForm.refId,
+                        plan: this.subForm.plan
+                    };
+
+                    if (this.settings.autoVerify) {
+                        this.totalRevenue += payObj.amount;
+                        if (this.currentUser) this.currentUser.isVip = true;
+                        this.notify('success', 'Auto-Verified!', 'VIP Pass Activated Successfully');
+                    } else {
+                        this.pendingPayments.push(payObj);
+                        this.notify('info', 'Payment Submitted', 'Owner Ssemujju Sahel will verify code ' + payObj.refId);
+                    }
+                    this.showSubModal = false;
+                },
+
+                // Local Storage File Upload CMS Logic
+                handleVideoFileUpload(e) {
+                    const file = e.target.files[0];
+                    if (file) {
+                        const localUrl = URL.createObjectURL(file);
+                        this.activeMovieForm.streamUrl = localUrl;
+                        this.activeMovieForm.isLocalFile = true;
+                        this.notify('success', 'Local Video Loaded', file.name + ' ready for streaming');
+                    }
+                },
+
+                handlePosterFileUpload(e) {
+                    const file = e.target.files[0];
+                    if (file) {
+                        const localImgUrl = URL.createObjectURL(file);
+                        this.activeMovieForm.poster = localImgUrl;
+                        this.notify('success', 'Poster Artwork Loaded', file.name);
+                    }
+                },
+
+                openMovieModal() {
+                    this.isEditingMovie = false;
+                    this.activeMovieForm = { id: null, title: '', vj: 'VJ Junior', category: 'VJ Luganda Translated', isFree: false, streamUrl: '', poster: '', isLocalFile: false, description: '' };
+                    this.showMovieModal = true;
+                },
+
+                editMovie(m) {
+                    this.isEditingMovie = true;
+                    this.activeMovieForm = JSON.parse(JSON.stringify(m));
+                    this.showMovieModal = true;
+                },
+
+                saveMovieCMS() {
+                    if (this.isEditingMovie) {
+                        const idx = this.moviesCatalog.findIndex(m => m.id === this.activeMovieForm.id);
+                        if (idx !== -1) this.moviesCatalog[idx] = JSON.parse(JSON.stringify(this.activeMovieForm));
+                    } else {
+                        const newM = JSON.parse(JSON.stringify(this.activeMovieForm));
+                        newM.id = 'm_' + Date.now();
+                        newM.year = '2026';
+                        this.moviesCatalog.unshift(newM);
+                    }
+                    this.showMovieModal = false;
+                    this.notify('success', 'Catalog Saved', this.activeMovieForm.title);
+                },
+
+                deleteMovie(id) {
+                    this.moviesCatalog = this.moviesCatalog.filter(m => m.id !== id);
+                    this.notify('info', 'Deleted', 'Movie removed');
+                },
+
+                approvePayment(pay) {
+                    this.totalRevenue += pay.amount;
+                    this.pendingPayments = this.pendingPayments.filter(p => p.id !== pay.id);
+                    const usr = this.usersList.find(u => u.phone === pay.userPhone || u.name === pay.userName);
+                    if (usr) usr.isVip = true;
+                    this.notify('success', 'Approved', pay.userName + ' VIP Activated');
+                },
+
+                rejectPayment(pay) {
+                    this.pendingPayments = this.pendingPayments.filter(p => p.id !== pay.id);
+                    this.notify('error', 'Rejected', 'Payment rejected');
+                },
+
+                toggleUserVip(u) {
+                    u.isVip = !u.isVip;
+                    this.notify('info', 'VIP Toggle', u.name + (u.isVip ? ' granted VIP' : ' VIP revoked'));
+                },
+
+                dismissAd() {
+                    this.activeAd = null;
+                },
+
+                trackAdClick(ad) {
+                    this.notify('info', 'Advertiser Clicked', ad.title);
+                },
+
+                saveSettings() {
+                    this.notify('success', 'Saved', 'Settings saved');
+                },
+
+                notify(type, title, message) {
+                    const id = Date.now();
+                    this.toasts.push({ id, type, title, message });
+                    setTimeout(() => { this.removeToast(id); }, 4000);
+                },
+
+                removeToast(id) {
+                    this.toasts = this.toasts.filter(t => t.id !== id);
+                },
+
+                getVipCount() { return this.usersList.filter(u => u.isVip).length; },
+                getVjCount() { return this.moviesCatalog.filter(m => m.vj).length; },
+                formatUGX(v) { return 'UGX ' + Number(v).toLocaleString(); }
+            }
+        }
+    </script>
+</body>
+</html>
